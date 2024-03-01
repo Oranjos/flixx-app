@@ -36,8 +36,43 @@ async function displayPopularMovies() {
   });
 }
 
+// Display 20 most popular TV Shows
+async function displayPopularShows() {
+  const { results } = await fetchAPIData("tv/popular");
+
+  results.forEach((show) => {
+    const div = document.createElement("div");
+    div.classList.add("card");
+    div.innerHTML = `
+        <a href="tv-details.html?id=${show.id}">
+        ${
+          show.poster_path
+            ? `<img
+         src="https://image.tmdb.org/t/p/w500${show.poster_path}"
+         class="card-img-top"
+         alt="${show.name}"
+       />`
+            : `<img
+       src="images/no-image.jpg"
+       class="card-img-top"
+       alt="${show.name}"
+     />`
+        }
+        </a>
+      <div class="card-body">
+        <h5 class="card-title">${show.name}</h5>
+        <p class="card-text">
+          <small class="text-muted">Air Date:${show.first_air_date}</small>
+        </p>
+        </div>`;
+
+    document.querySelector("#popular-shows").appendChild(div);
+  });
+}
+
 // Fetch data from TMDB API
 async function fetchAPIData(endpoint) {
+  // This is only for small projects. You should store your key and make request from server
   const API_KEY = "87efe31b822feb4be5b53c2f55f21ea1";
   const API_URL = "https://api.themoviedb.org/3/";
 
@@ -45,9 +80,22 @@ async function fetchAPIData(endpoint) {
     `${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`
   );
 
+  showSpinner();
+
   const data = await response.json();
 
+  hideSpinner();
+
   return data;
+}
+
+// Show spinner
+function showSpinner() {
+  document.querySelector(".spinner").classList.add("show");
+}
+
+function hideSpinner() {
+  document.querySelector(".spinner").classList.remove("show");
 }
 
 // Highlight active link
@@ -68,7 +116,7 @@ function init() {
       displayPopularMovies();
       break;
     case "/shows.html":
-      console.log("Shows");
+      displayPopularShows();
       break;
     case "/movie-details.html":
       console.log("Movie Details");
